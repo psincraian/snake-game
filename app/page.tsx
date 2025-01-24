@@ -1,7 +1,6 @@
 'use client'
 
 import { useGameLogic } from '@/app/components/game-board'
-import { Leaderboard } from '@/app/components/leaderboard'
 import { useEffect } from 'react';
 
 export default function Home() {
