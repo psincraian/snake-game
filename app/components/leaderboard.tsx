@@ -69,6 +69,10 @@ export const Leaderboard = ({ cancelCountdown }: { score: number, cancelCountdow
     <div className="w-full max-w-md bg-gray-800 p-4 rounded-lg space-y-4">
       <h2 className="text-2xl font-bold text-white">Leaderboard</h2>
 
+      <div className="text-xl font-bold text-white">
+        Your Score: {userScore}
+      </div>
+
       <div className="flex gap-2">
         <input
           type="text"
