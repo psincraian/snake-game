@@ -1,3 +1,5 @@
+import { Direction } from "./game-board";
+
 interface ControlsProps {
   onDirectionChange: (direction: Direction) => void;
 }
