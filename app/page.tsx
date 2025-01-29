@@ -12,10 +12,16 @@ export default function Home() {
     resetGame
   } = useGameLogic();
 
-    // Auto-focus container for keyboard events
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handleStart();
+    }
+  };
+
   useEffect(() => {
     if (canvasRef.current) {
       canvasRef.current.focus();
+      canvasRef.current.addEventListener('keydown', (event) => handleKeyDown(event));
     }
   }, [canvasRef, gameState]);
 
@@ -25,6 +31,7 @@ export default function Home() {
     }
     startGame();
   };
+
 
   return (
     <main className="min-h-screen bg-gray-900 flex flex-col items-center p-4">
@@ -63,7 +70,7 @@ export default function Home() {
         )}
       </div>
 
-      <div className="mt-4 text-xl font-bold text-snake">
+      <div className="mt-4 text-xl font-bold text-white text-snake">
         Score: {score}
       </div>
 
