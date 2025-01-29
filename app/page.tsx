@@ -3,6 +3,7 @@
 import { useGameLogic } from '@/app/components/game-board'
 import { useEffect } from 'react';
 import { Controls } from './components/controls';
+import { Leaderboard } from './components/leaderboard';
 
 export default function Home() {
   const {
@@ -60,11 +61,15 @@ export default function Home() {
         )}
 
         {gameState === 'GAME_OVER' && (
-          <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 space-y-4 rounded-lg">
-            {/* ... existing game over content ... */}
+          <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 space-y-4 rounded-lg overflow-y-auto">
+            <h2 className="text-3xl font-bold text-red-500">Game Over!</h2>
+            <p className="text-xl text-white">Final Score: {score}</p>
+
+            <Leaderboard score={score} />
+
             <button
               onClick={handleStart}
-              className="px-6 py-2 bg-snake hover:bg-green-600 text-white rounded-lg"
+              className="px-6 py-2 bg-snake hover:bg-green-600 text-white rounded-lg mt-4"
             >
               Play Again (Enter)
             </button>

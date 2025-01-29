@@ -1,32 +1,45 @@
 import { useState, useEffect } from 'react'
 
-type ScoreEntry = { username: string; score: number; date: string }
+type ScoreEntry = { 
+  username: string
+  score: number
+  timestamp: number
+}
+
+type LeaderboardType = 'daily' | 'monthly' | 'yearly' | 'allTime'
 
 export const Leaderboard = ({ score }: { score: number }) => {
-  const [scores, setScores] = useState<ScoreEntry[]>([])
-  const [username, setUsername] = useState('')
+  const [scores, setScores] = useState<{ [key in LeaderboardType]: ScoreEntry[] }>({
+    daily: [],
+    monthly: [],
+    yearly: [],
+    allTime: []
+  })
+  const [username, setUsername] = useState('anonymous')
+  const [activeTab, setActiveTab] = useState<LeaderboardType>('allTime')
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    const saved = localStorage.getItem('snakeScores')
-    setScores(saved ? JSON.parse(saved) : [])
+    fetchScores()
   }, [])
 
-  const saveScore = () => {
-    if (!username.trim() || score === 0) return
+  const fetchScores = async () => {
+    const response = await fetch('/api/scores')
+    const data = await response.json()
+    setScores(data)
+  }
 
-    const newEntry = {
-      username: username.trim(),
-      score,
-      date: new Date().toISOString()
-    }
+  const saveScore = async () => {
+    if (!username.trim() || score === 0 || saved) return
 
-    const updated = [...scores, newEntry]
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 10)
+    await fetch('/api/scores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username.trim(), score })
+    })
 
-    localStorage.setItem('snakeScores', JSON.stringify(updated))
-    setScores(updated)
-    setUsername('')
+    setSaved(true)
+    await fetchScores()
   }
 
   return (
@@ -49,13 +62,27 @@ export const Leaderboard = ({ score }: { score: number }) => {
         </button>
       </div>
 
+      <div className="flex gap-2 mb-4">
+        {(['daily', 'monthly', 'yearly', 'allTime'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-3 py-1 rounded ${
+              activeTab === tab ? 'bg-snake text-white' : 'bg-gray-700 text-gray-300'
+            }`}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
+      </div>
+
       <div className="space-y-2">
-        {scores.map((entry, i) => (
+        {scores[activeTab].map((entry: ScoreEntry, i) => (
           <div key={i} className="flex justify-between items-center bg-gray-700 p-2 rounded">
             <span className="text-white">{entry.username}</span>
             <span className="text-snake font-bold">{entry.score}</span>
             <span className="text-gray-400 text-sm">
-              {new Date(entry.date).toLocaleDateString()}
+              {new Date(entry.timestamp).toLocaleDateString()}
             </span>
           </div>
         ))}
