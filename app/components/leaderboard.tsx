@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { LeaderboardItem } from '../api/leaderboard/top/route'
 
 type LeaderboardType = 'daily' | 'monthly' | 'yearly'
@@ -14,16 +14,17 @@ export const Leaderboard = ({ score }: { score: number }) => {
   })
   const [activeTab, setActiveTab] = useState<LeaderboardType>('daily')
   const [saved, setSaved] = useState(false)
-
-  useEffect(() => {
-    fetchScores()
-  }, [saved, activeTab])
-
-  const fetchScores = async () => {
+  
+  const fetchScores = useCallback(async () => {
     const response = await fetch('/api/leaderboard/top?timeFrame=' + activeTab)
     const data = await response.json()
     setScores(data.data)
-  }
+  }, [activeTab])
+  
+  // Update useEffect dependency array
+  useEffect(() => {
+    fetchScores()
+  }, [saved, activeTab, fetchScores])
 
   const saveScore = async () => {
     if (!username.trim() || score === 0 || saved) return

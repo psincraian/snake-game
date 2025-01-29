@@ -1,7 +1,7 @@
 'use client'
 
 import { useGameLogic } from '@/app/components/game-board'
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Controls } from './components/controls';
 import { Leaderboard } from './components/leaderboard';
 
@@ -15,25 +15,26 @@ export default function Home() {
     setDirection
   } = useGameLogic();
 
-  const handleKeyDown = (event: KeyboardEvent) => {
+  const handleStart = useCallback(() => {
+    if (gameState === 'GAME_OVER') {
+      resetGame();
+    }
+    startGame();
+  }, [resetGame, startGame, gameState]);
+
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (event.key === 'Enter') {
       handleStart();
     }
-  };
+  }, [handleStart]);
+  
 
   useEffect(() => {
     if (canvasRef.current) {
       canvasRef.current.focus();
       canvasRef.current.addEventListener('keydown', (event) => handleKeyDown(event));
     }
-  }, [canvasRef, gameState]);
-
-  const handleStart = () => {
-    if (gameState === 'GAME_OVER') {
-      resetGame();
-    }
-    startGame();
-  };
+  }, [canvasRef, gameState, handleKeyDown]);
 
 
   return (

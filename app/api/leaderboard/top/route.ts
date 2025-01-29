@@ -29,7 +29,7 @@ export async function GET(request: Request) {
       Limit: limit,
     }));
 
-    const formattedItems = (Items || []).map((item: any) => ({
+    const formattedItems = (Items || []).map((item: Record<string, unknown>) => ({
       username: item.username,
       score: item.score,
       datetime: item.datetime,

@@ -5,7 +5,6 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const username = searchParams.get("username")!;
     const score = parseInt(searchParams.get("score")!);
     const datetime = searchParams.get("datetime")!;
 
@@ -29,10 +28,10 @@ async function getTimeFramePosition(timeFrame: "daily" | "monthly" | "yearly", d
   const partitionValue = formatPartitionValue(timeFrame, date);
 
   let count = 0;
-  let lastEvaluatedKey: any = undefined;
+  let lastEvaluatedKey: Record<string, unknown>|undefined = undefined;
 
   do {
-    const { Count, LastEvaluatedKey } = await docClient.send(new QueryCommand({
+    const { Count, LastEvaluatedKey }: { Count?: number; LastEvaluatedKey?: Record<string, unknown> } = await docClient.send(new QueryCommand({
       TableName: "Leaderboard",
       IndexName: indexName,
       KeyConditionExpression: `${timeFrame}_partition = :partition AND score > :score`,

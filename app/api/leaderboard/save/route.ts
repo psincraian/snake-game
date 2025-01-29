@@ -7,7 +7,6 @@ export async function POST(request: Request) {
     const { username, score } = await request.json();
 
     const datetime = new Date();
-    const datetimeString = datetime.toISOString();
     const item = {
       username,
       datetime: datetime.toISOString(),
