@@ -59,7 +59,7 @@ export const Leaderboard = ({ score }: { score: number }) => {
         />
         <button
           onClick={saveScore}
-          className="px-4 py-2 bg-snake hover:bg-green-600 rounded text-white"
+          className="px-4 py-2 bg-snake bg-green-600 hover:bg-green-700 rounded text-white"
         >
           Save
         </button>
