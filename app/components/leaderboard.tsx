@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-type ScoreEntry = { 
+type ScoreEntry = {
   username: string
   score: number
   timestamp: number
@@ -15,7 +15,13 @@ export const Leaderboard = ({ score }: { score: number }) => {
     yearly: [],
     allTime: []
   })
-  const [username, setUsername] = useState('anonymous')
+  // In Leaderboard component
+  const [username, setUsername] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('snakeUsername') || 'anonymous'
+    }
+    return 'anonymous'
+  })
   const [activeTab, setActiveTab] = useState<LeaderboardType>('allTime')
   const [saved, setSaved] = useState(false)
 
@@ -42,16 +48,22 @@ export const Leaderboard = ({ score }: { score: number }) => {
     await fetchScores()
   }
 
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newUsername = e.target.value
+    setUsername(newUsername)
+    localStorage.setItem('snakeUsername', newUsername)
+  }
+
   return (
     <div className="w-full max-w-md bg-gray-800 p-4 rounded-lg space-y-4">
       <h2 className="text-2xl font-bold text-white">Leaderboard</h2>
-      
+
       <div className="flex gap-2">
         <input
           type="text"
           placeholder="Enter username"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => handleUsernameChange(e)}
           className="flex-1 p-2 rounded bg-gray-700 text-white"
         />
         <button
@@ -67,9 +79,8 @@ export const Leaderboard = ({ score }: { score: number }) => {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-3 py-1 rounded ${
-              activeTab === tab ? 'bg-snake text-white' : 'bg-gray-700 text-gray-300'
-            }`}
+            className={`px-3 py-1 rounded ${activeTab === tab ? 'bg-snake text-white' : 'bg-gray-700 text-gray-300'
+              }`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
