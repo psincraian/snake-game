@@ -2,6 +2,7 @@
 
 import { useGameLogic } from '@/app/components/game-board'
 import { useEffect } from 'react';
+import { Controls } from './components/controls';
 
 export default function Home() {
   const {
@@ -9,7 +10,8 @@ export default function Home() {
     gameState,
     score,
     startGame,
-    resetGame
+    resetGame,
+    setDirection
   } = useGameLogic();
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -73,6 +75,8 @@ export default function Home() {
       <div className="mt-4 text-xl font-bold text-white text-snake">
         Score: {score}
       </div>
+
+      <Controls onDirectionChange={setDirection} />
 
       <footer className="mt-8 text-gray-400">
         <a

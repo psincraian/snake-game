@@ -141,7 +141,8 @@ export const useGameLogic = () => {
         gameState,
         score,
         startGame,
-        resetGame
+        resetGame,
+        setDirection
     };
 };
 
