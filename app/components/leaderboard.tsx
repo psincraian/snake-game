@@ -1,20 +1,10 @@
 import { useState, useEffect } from 'react'
+import { LeaderboardItem } from '../api/leaderboard/top/route'
 
-type ScoreEntry = {
-  username: string
-  score: number
-  timestamp: number
-}
-
-type LeaderboardType = 'daily' | 'monthly' | 'yearly' | 'allTime'
+type LeaderboardType = 'daily' | 'monthly' | 'yearly'
 
 export const Leaderboard = ({ score }: { score: number }) => {
-  const [scores, setScores] = useState<{ [key in LeaderboardType]: ScoreEntry[] }>({
-    daily: [],
-    monthly: [],
-    yearly: [],
-    allTime: []
-  })
+  const [scores, setScores] = useState<LeaderboardItem[] >([])
   // In Leaderboard component
   const [username, setUsername] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -22,23 +12,23 @@ export const Leaderboard = ({ score }: { score: number }) => {
     }
     return 'anonymous'
   })
-  const [activeTab, setActiveTab] = useState<LeaderboardType>('allTime')
+  const [activeTab, setActiveTab] = useState<LeaderboardType>('daily')
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     fetchScores()
-  }, [])
+  }, [saved, activeTab])
 
   const fetchScores = async () => {
-    const response = await fetch('/api/scores')
+    const response = await fetch('/api/leaderboard/top?timeFrame=' + activeTab)
     const data = await response.json()
-    setScores(data)
+    setScores(data.data)
   }
 
   const saveScore = async () => {
     if (!username.trim() || score === 0 || saved) return
 
-    await fetch('/api/scores', {
+    await fetch('/api/leaderboard/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: username.trim(), score })
@@ -75,7 +65,7 @@ export const Leaderboard = ({ score }: { score: number }) => {
       </div>
 
       <div className="flex gap-2 mb-4">
-        {(['daily', 'monthly', 'yearly', 'allTime'] as const).map((tab) => (
+        {(['daily', 'monthly', 'yearly'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -88,12 +78,12 @@ export const Leaderboard = ({ score }: { score: number }) => {
       </div>
 
       <div className="space-y-2">
-        {scores[activeTab].map((entry: ScoreEntry, i) => (
+        {scores.map((entry: LeaderboardItem, i) => (
           <div key={i} className="flex justify-between items-center bg-gray-700 p-2 rounded">
             <span className="text-white">{entry.username}</span>
             <span className="text-snake font-bold">{entry.score}</span>
             <span className="text-gray-400 text-sm">
-              {new Date(entry.timestamp).toLocaleDateString()}
+              {new Date(entry.datetime).toLocaleDateString()}
             </span>
           </div>
         ))}
