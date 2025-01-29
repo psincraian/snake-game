@@ -60,7 +60,7 @@ export default function LeaderboardPage() {
                     Start New Game ({countdown})
                 </button>
             </div>
-            <Leaderboard score={0} />
+            <Leaderboard score={0} cancelCountdown={handleCancelCountdown} />
         </main>
     );
 }

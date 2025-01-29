@@ -26,6 +26,7 @@ export default function Home() {
 
   useEffect(() => {
     if (gameState === 'GAME_OVER') {
+        localStorage.setItem('snakeGameScore', score.toString());
         router.push('/leaderboard');
     }
   }, [gameState, router]);

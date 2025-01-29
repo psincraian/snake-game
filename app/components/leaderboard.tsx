@@ -3,7 +3,7 @@ import { LeaderboardItem } from '../api/leaderboard/top/route'
 
 type LeaderboardType = 'daily' | 'monthly' | 'yearly'
 
-export const Leaderboard = ({ score }: { score: number }) => {
+export const Leaderboard = ({ cancelCountdown }: { score: number, cancelCountdown: () => void; }) => {
   const [scores, setScores] = useState<LeaderboardItem[] >([])
   // In Leaderboard component
   const [username, setUsername] = useState(() => {
@@ -14,12 +14,26 @@ export const Leaderboard = ({ score }: { score: number }) => {
   })
   const [activeTab, setActiveTab] = useState<LeaderboardType>('daily')
   const [saved, setSaved] = useState(false)
+  const [userScore, setUserScore] = useState<number>(0);
+
+
+  useEffect(() => {
+    const storedScore = localStorage.getItem('snakeGameScore');
+    if (storedScore) {
+      setUserScore(parseInt(storedScore, 10));
+    }
+  }, []);
   
   const fetchScores = useCallback(async () => {
     const response = await fetch('/api/leaderboard/top?timeFrame=' + activeTab)
     const data = await response.json()
     setScores(data.data)
   }, [activeTab])
+
+  const handleActiveTabChange = (tab: LeaderboardType) => {
+    setActiveTab(tab)
+    cancelCountdown()
+  }
   
   // Update useEffect dependency array
   useEffect(() => {
@@ -27,12 +41,17 @@ export const Leaderboard = ({ score }: { score: number }) => {
   }, [saved, activeTab, fetchScores])
 
   const saveScore = async () => {
-    if (!username.trim() || score === 0 || saved) return
+    cancelCountdown();
+    console.log(username, userScore, saved)
+    if (!username.trim() || userScore === 0 || saved) {
+      console.log('no data returning')
+      return
+    }
 
     await fetch('/api/leaderboard/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: username.trim(), score })
+      body: JSON.stringify({ username: username.trim(), score: userScore })
     })
 
     setSaved(true)
@@ -41,6 +60,7 @@ export const Leaderboard = ({ score }: { score: number }) => {
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUsername = e.target.value
+    cancelCountdown();
     setUsername(newUsername)
     localStorage.setItem('snakeUsername', newUsername)
   }
@@ -55,6 +75,7 @@ export const Leaderboard = ({ score }: { score: number }) => {
           placeholder="Enter username"
           value={username}
           onChange={(e) => handleUsernameChange(e)}
+          onClick={cancelCountdown}
           className="flex-1 p-2 rounded bg-gray-700 text-white"
         />
         <button
@@ -69,7 +90,7 @@ export const Leaderboard = ({ score }: { score: number }) => {
         {(['daily', 'monthly', 'yearly'] as const).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => handleActiveTabChange(tab)}
             className={`px-3 py-1 rounded ${activeTab === tab ? 'bg-snake text-white' : 'bg-gray-700 text-gray-300'
               }`}
           >
