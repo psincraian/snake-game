@@ -36,6 +36,31 @@ export function Controls({ onDirectionChange }: ControlsProps) {
     }
   }, [activeDirection, onDirectionChange]);
 
+  const handleSingleTouch = useCallback((e: TouchEvent | React.TouchEvent) => {
+    if (!controlRef.current) return;
+
+    const touch = 'touches' in e ? e.touches[0] : e;
+    const rect = controlRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    // Calculate angle from center to touch point
+    const angle = Math.atan2(
+      touch.clientY - centerY,
+      touch.clientX - centerX
+    ) * 180 / Math.PI;
+
+    // Convert angle to direction
+    let newDirection: Direction;
+    if (angle >= -45 && angle < 45) newDirection = 'RIGHT';
+    else if (angle >= 45 && angle < 135) newDirection = 'DOWN';
+    else if (angle >= -135 && angle < -45) newDirection = 'UP';
+    else newDirection = 'LEFT';
+
+    setActiveDirection(newDirection);
+    onDirectionChange(newDirection);
+  }, [onDirectionChange]);
+
   const handleTouchEnd = useCallback(() => {
     setActiveDirection(null);
   }, []);
@@ -46,6 +71,7 @@ export function Controls({ onDirectionChange }: ControlsProps) {
       className="lg:hidden relative w-48 h-48 mx-auto mt-8"
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onTouchStart={handleSingleTouch}
     >
       <div className="absolute inset-0 rounded-full bg-gray-800/50 border-2 border-snake/30">
         {/* Up */}

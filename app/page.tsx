@@ -39,8 +39,11 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-900 flex flex-col items-center p-4">
       <h1 className="text-4xl font-bold text-white mt-8 mb-4">Snake Game</h1>
-      
+      <div className="mt-4 text-xl font-bold text-white text-snake">
+        Score: {score}
+      </div>
       <div className="relative w-full max-w-lg">
+        
       <canvas
           ref={canvasRef}
           width={400}
@@ -77,22 +80,7 @@ export default function Home() {
         )}
       </div>
 
-      <div className="mt-4 text-xl font-bold text-white text-snake">
-        Score: {score}
-      </div>
-
       <Controls onDirectionChange={setDirection} />
-
-      <footer className="mt-8 text-gray-400">
-        <a
-          href="https://github.com/yourusername/snake-game"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:text-white transition-colors"
-        >
-          View Source Code ↗
-        </a>
-      </footer>
     </main>
   )
 }
