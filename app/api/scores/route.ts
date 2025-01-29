@@ -2,10 +2,10 @@ import { kv } from '@vercel/kv'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
-  const allTimeScores = await kv.zrange('scores:all', 0, 100, { rev: true })
-  const dailyScores = await kv.zrange(`scores:day:${getDateKey()}`, 0, 100, { rev: true })
-  const monthlyScores = await kv.zrange(`scores:month:${getMonthKey()}`, 0, 100, { rev: true })
-  const yearlyScores = await kv.zrange(`scores:year:${new Date().getFullYear()}`, 0, 100, { rev: true })
+  const allTimeScores = await kv.zrange('scores:all', 0, 19, { rev: true })
+  const dailyScores = await kv.zrange(`scores:day:${getDateKey()}`, 0, 19, { rev: true })
+  const monthlyScores = await kv.zrange(`scores:month:${getMonthKey()}`, 0, 19, { rev: true })
+  const yearlyScores = await kv.zrange(`scores:year:${new Date().getFullYear()}`, 0, 19, { rev: true })
 
   return NextResponse.json({
     allTime: allTimeScores,
