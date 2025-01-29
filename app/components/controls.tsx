@@ -1,5 +1,5 @@
 import { Direction } from "./game-board";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ControlsProps {
   onDirectionChange: (direction: Direction) => void;
@@ -65,10 +65,32 @@ export function Controls({ onDirectionChange }: ControlsProps) {
     setActiveDirection(null);
   }, []);
 
+  // Prevent scrolling on mobile
+  useEffect(() => {
+    const preventScroll = (e: TouchEvent) => {
+      e.preventDefault();
+    };
+
+    const element = controlRef.current;
+    if (element) {
+      element.addEventListener('touchstart', preventScroll, { passive: false });
+      element.addEventListener('touchmove', preventScroll, { passive: false });
+      element.addEventListener('touchend', preventScroll, { passive: false });
+    }
+
+    return () => {
+      if (element) {
+        element.removeEventListener('touchstart', preventScroll);
+        element.removeEventListener('touchmove', preventScroll);
+        element.removeEventListener('touchend', preventScroll);
+      }
+    };
+  }, []);
+
   return (
     <div
       ref={controlRef}
-      className="lg:hidden relative w-48 h-48 mx-auto mt-8"
+      className="lg:hidden relative w-48 h-48 mx-auto mt-8 touch-action-none"
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onTouchStart={handleSingleTouch}
