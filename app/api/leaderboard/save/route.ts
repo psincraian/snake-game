@@ -12,6 +12,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: "Invalid username. Only alphanumeric characters and emojis are allowed." }, { status: 400 });
     }
 
+    if (score < 1) {
+      return NextResponse.json({ success: false, message: "Invalid score. Score must be a positive integer." }, { status: 400 });
+    }
+
     const datetime = new Date();
     const item = {
       username,

@@ -7,6 +7,13 @@ type GameState = 'START' | 'PLAYING' | 'GAME_OVER';
 const GRID_SIZE = 20;
 const INITIAL_SPEED = 150;
 
+const oppositeDirection: { [key in Direction]: Direction } = {
+    UP: 'DOWN',
+    DOWN: 'UP',
+    LEFT: 'RIGHT',
+    RIGHT: 'LEFT'
+};
+
 export const useGameLogic = () => {
     const [snake, setSnake] = useState<Position[]>([{ x: 10, y: 10 }]);
     const [food, setFood] = useState<Position>({ x: 15, y: 15 });
@@ -70,20 +77,20 @@ export const useGameLogic = () => {
         });
     }, [direction, food.x, food.y, gameState, generateFood, checkCollision]);
 
-    // Handle key press with proper dependencies
+    // Memoize handleKeyPress function
     const handleKeyPress = useCallback((e: KeyboardEvent) => {
         const keyDirectionMap: { [key: string]: Direction } = {
-            ArrowUp: 'UP',
-            ArrowDown: 'DOWN',
-            ArrowLeft: 'LEFT',
-            ArrowRight: 'RIGHT'
+          ArrowUp: 'UP',
+          ArrowDown: 'DOWN',
+          ArrowLeft: 'LEFT',
+          ArrowRight: 'RIGHT'
         };
-
+    
         const newDirection = keyDirectionMap[e.key];
-        if (newDirection && direction !== oppositeDirection[newDirection]) {
-            setDirection(newDirection);
+        if (newDirection && newDirection !== oppositeDirection[direction]) {
+          setDirection(newDirection);
         }
-    }, [direction]);
+      }, [direction]);
 
     useEffect(() => {
         document.addEventListener('keydown', handleKeyPress);
@@ -144,11 +151,4 @@ export const useGameLogic = () => {
         resetGame,
         setDirection
     };
-};
-
-const oppositeDirection: { [key in Direction]: Direction } = {
-    UP: 'DOWN',
-    DOWN: 'UP',
-    LEFT: 'RIGHT',
-    RIGHT: 'LEFT'
 };
