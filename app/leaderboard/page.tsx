@@ -10,6 +10,20 @@ export default function LeaderboardPage() {
     const [countdown, setCountdown] = useState(5);
     const [isCountdownActive, setIsCountdownActive] = useState(true);
     const [scoreSaved, setScoreSaved] = useState(false);
+    const [storedScore, setStoredScore] = useState<number>(0);
+    const [username, setUsername] = useState<string>('anonymous');
+  
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+          const score = localStorage.getItem('snakeGameScore');
+          const user = localStorage.getItem('snakeUsername') || 'anonymous';
+          if (score) {
+            setStoredScore(parseInt(score, 10));
+          }
+          setUsername(user);
+        }
+      }, []);
 
     useEffect(() => {
         if (!isCountdownActive) return;
@@ -49,17 +63,15 @@ export default function LeaderboardPage() {
     };
 
     const saveScore = async () => {
-        const storedScore = localStorage.getItem('snakeGameScore');
-        const username = localStorage.getItem('snakeUsername') || 'anonymous';
         if (storedScore && !scoreSaved) {
-            await fetch('/api/leaderboard/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, score: parseInt(storedScore, 10) })
-            });
-            setScoreSaved(true);
+          await fetch('/api/leaderboard/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, score: storedScore })
+          });
+          setScoreSaved(true);
         }
-    };
+      };
 
     return (
         <main className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
@@ -78,7 +90,7 @@ export default function LeaderboardPage() {
                     Start New Game ({countdown})
                 </button>
             </div>
-            <Leaderboard score={parseInt(localStorage.getItem('snakeGameScore') || '0', 10)} cancelCountdown={handleCancelCountdown} />
+            <Leaderboard  score={storedScore} cancelCountdown={handleCancelCountdown} />
         </main>
     );
 }
